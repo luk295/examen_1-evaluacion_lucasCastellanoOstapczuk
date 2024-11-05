@@ -1,0 +1,33 @@
+# Para finalizar, vamos a desplegar el artefacto generado en Azure. Quien desee probar, 
+# puede utilizar el plan de estudiante https://azure.microsoft.com/es-es/free/students
+
+# Además, vamos a pasar auditoría de seguridad Real y productiva (usado por muchísimas empresas) con Snyk
+# https://snyk.io
+
+# Instalación de node + npm para ejecutar el cliente snyk en local + app web
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+
+# Instalación de nvm
+nvm install 20
+
+# Verificar que node está instalado
+node -v # debería imprimir `v20.18.0`
+
+# Verifica la versión de npm
+npm -v # debería imprimir `10.8.2`
+
+# IMPORTANTE: Si todo ha ido bien, dentro del directorio del código fuente, "app" (el que contiene package.json), ejecutar el siguiente comando (puede tardar)
+npm install --save-dev
+
+# Para comprobar que todo se han instalado, en el mismo directorio
+npm run start
+
+# Instalación de snyk
+npm install snyk -g 
+
+# Configuración  autenticación
+snyk auth
+
+# Verificación local del código (dentro del directorio "app")
+snyk test
+

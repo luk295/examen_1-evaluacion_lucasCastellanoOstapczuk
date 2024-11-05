@@ -1,0 +1,57 @@
+# Instrucciones para descargar el repositorio y copiarlo a uno propio
+
+# En primer lugar, crear un nuevo repositorio en Github. 
+# IMPORTANTE!!: NO inicializarlo (NO crear el README.md). 
+# Una vez creado, anotar / copiar la URL del repositorio (terminada en .git)
+
+# A continuación, abrir un terminal y crear un directorio donde descargaremos y configuraremos 
+# el repositorio. Ejemplo, si se trata de la sesión 2, podemos hacer:
+
+mkdir sesion_2
+cd sesion_2
+git clone https://github.com/msectest/demos_cicd.git
+cd demos_cicd
+
+# Con el siguiente borrado, eliminamos el .git -> desconectamos el repositorio del origen.
+rm -Rf .git
+
+# Ahora inicializaremos de nuevo el repositorio y lo vinculamos al que hemos creado en el primer paso.
+git init
+git add .
+git commit -m 'Subida inicial'
+git branch -M main
+git remote add origin https://github.com/… (resto de la ruta de vuestro repositorio anotado)
+git push -u origin main
+
+# Al llegar aquí, habréis inicialidado, vinculado y subido los archivos a la rama main de vuestro repositorio
+# Ahora creamos la rama develop
+
+git checkout -b develop
+git push --set-upstream origin develop
+git push // Debería mostrar everything up-to-date
+
+# Para evitar errores, podemos configurar en settings la rama develop como default, así las PR irán por defecto a dicha rama
+# y evitamos crear una PR por despiste sobre main
+
+# Y ya hemos terminado. Ya podemos trabajar normalmente creando ramas sobre develop y realizando pull-requests
+# para solicitar los merges, comprobar nuestros  controles , eetc. Ejemplo, estando en la rama develop
+
+git branch // debe mostrarse develop seleccionada, en caso contrario:
+git checkout develop
+
+# Creamos una rama a partir de develop con el nombre sesion_2
+git checkout -b sesion_2
+
+# Realizamos las tareas que tengamos que llevar a cabo (modificación scripts, etc.) y subimos los cambios.
+git add .
+git commit -m 'Cambios sesión 2'
+git push --set-upstream origin sesion_2
+git push // Debería mostrar everything up-to-date
+
+# En github podremos realizar la pull request desde sesion_2 a develop para verificar las modificaciones. 
+# Seleccionando merge, mezclaremos los cambios en la rama develop.  NO olviddar marcar la rama destino a develop.
+# Si queremos actualizar nuestra copia local de develop, debemos bajar las modificaciones  del reposiorio remoto con pull.
+
+git checkout develop
+git pull
+

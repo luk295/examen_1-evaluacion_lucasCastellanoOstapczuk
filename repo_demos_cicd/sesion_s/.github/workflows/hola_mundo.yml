@@ -1,0 +1,29 @@
+name: Mi primer action!
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+  workflow_dispatch:
+
+
+jobs:
+
+  nombre-del-job:
+  
+    # Tipo de runner en el que se ejecutará el job
+    runs-on: ubuntu-latest
+
+    # Secuencia de tareas
+    steps:
+      # Descarga del repositorio a la ruta $GITHUB_WORKSPACE
+      - uses: actions/checkout@v4
+
+      # Ejecuta un comando en el shell
+      - name: Step Hola mundo
+        run: echo Hello, world!
+
+      # Otro comando
+      - name: Step varios comandos
+        run: |
+          echo Y aquí otra ejecución! Listado de archivos descargados del repositorio
+          ls -al $GITHUB_WORKSPACE
