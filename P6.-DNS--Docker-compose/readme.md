@@ -1,96 +1,5 @@
 # Práctica 6: Configuración cliente + servidor DNS
 
-CARACTERISTICAS DE LA RED:
-
-[
-    {
-        "Name": "bridge",
-        "Id": "68a70d38a558318722fd7d2ea0df16332bb7632acb28d6926c20cb6a32b28646",
-        "Created": "2024-11-04T17:16:25.551538783+01:00",
-        "Scope": "local",
-        "Driver": "bridge",
-        "EnableIPv6": false,
-        "IPAM": {
-            "Driver": "default",
-            "Options": null,
-            "Config": [
-                {
-                    "Subnet": "172.17.0.0/16",
-                    "Gateway": "172.17.0.1"
-                }
-            ]
-        },
-        "Internal": false,
-        "Attachable": false,
-        "Ingress": false,
-        "ConfigFrom": {
-            "Network": ""
-        },
-        "ConfigOnly": false,
-        "Containers": {},
-        "Options": {
-            "com.docker.network.bridge.default_bridge": "true",
-            "com.docker.network.bridge.enable_icc": "true",
-            "com.docker.network.bridge.enable_ip_masquerade": "true",
-            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
-            "com.docker.network.bridge.name": "docker0",
-            "com.docker.network.driver.mtu": "1500"
-        },
-        "Labels": {}
-    }
-]
-
-
-docker network inspect proyecto_compose_dns_subred
-[
-    {
-        "Name": "proyecto_compose_dns_subred",
-        "Id": "8a3faf45793a0b5057defdddb5a577e4daf300d0690a78974770f91113f59c74",
-        "Created": "2024-11-04T18:36:36.070062268+01:00",
-        "Scope": "local",
-        "Driver": "bridge",
-        "EnableIPv6": false,
-        "IPAM": {
-            "Driver": "default",
-            "Options": null,
-            "Config": [
-                {
-                    "Subnet": "172.22.0.0/16",
-                    "Gateway": "172.22.0.1"
-                }
-            ]
-        },
-        "Internal": false,
-        "Attachable": false,
-        "Ingress": false,
-        "ConfigFrom": {
-            "Network": ""
-        },
-        "ConfigOnly": false,
-        "Containers": {
-            "3c22a13f614306fa28bbb0ffc15311f689ec06eb2274912d009da1554139772a": {
-                "Name": "alpine-cliente",
-                "EndpointID": "368ae170d69bfa1854df8cd00b9064eef0385f53accbeac25a354330bd0be41d",
-                "MacAddress": "02:42:ac:16:00:02",
-                "IPv4Address": "172.22.0.2/16",
-                "IPv6Address": ""
-            },
-            "5e0ce403c6695b5022307d19a1a02919cb2eae2b78c5379ca28165e3585189e2": {
-                "Name": "bin-dns_Practica_6",
-                "EndpointID": "17b5ff3c62842cb56f9ad985a96174973fd2607d57c3a5e078315263d93e3bb1",
-                "MacAddress": "02:42:ac:16:00:03",
-                "IPv4Address": "172.22.0.3/16",
-                "IPv6Address": ""
-            }
-        },
-        "Options": {},
-        "Labels": {
-            "com.docker.compose.network": "dns_subred",
-            "com.docker.compose.project": "proyecto_compose",
-            "com.docker.compose.version": "2.29.2"
-        }
-    }
-]
 ### Engade ó docker-compose do DNS outro servicio (container) que faga a función de cliente.
 
 Creo un arquivo docker compose modificando o arquivo un pouco o arquivo anterior:
@@ -128,21 +37,157 @@ networks:
 
 A primera imaxe é do servidor e a segunda é do cliente dns, que é o alpine
 
-Creé la red `dns_subred`. 
-As características da rede son de bridge. Polo que máis adelante tendré que inspeccionar las direcciones para configurar la dirección dns y se vean
+Creé la red `dns_subred`. Máis adelante a a continuación...
 
 
 ### Usa unha imaxe alpine
 
+Feito
+
+
 
 ### Instala, se é preciso, os paquetes que precises para usar no cliente os comando de rede do seguinte enlace.
 
+Comprobo que ten `ip a` e `ìfconfig` con cada máquina e funciona:
+### Servidor DNS bind:
+```
+:
+
+/ # ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+24: eth0@if25: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:15:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.21.0.2/16 brd 172.21.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+/ # 
 
 
 
+/ # ifconfig
+eth0      Link encap:Ethernet  HWaddr 02:42:AC:15:00:02  
+          inet addr:172.21.0.2  Bcast:172.21.255.255  Mask:255.255.0.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:105 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:38 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:14495 (14.1 KiB)  TX bytes:3036 (2.9 KiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+/ # 
 
 
-### Comproba o seu uso
+
+```
+
+### Cliente alpine:
+
+```
+/ # ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+26: eth0@if27: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:15:00:03 brd ff:ff:ff:ff:ff:ff
+    inet 172.21.0.3/16 brd 172.21.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+/ # 
+
+
+/ # ifconfig
+eth0      Link encap:Ethernet  HWaddr 02:42:AC:15:00:03  
+          inet addr:172.21.0.3  Bcast:172.21.255.255  Mask:255.255.0.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:82 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:13022 (12.7 KiB)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+/ # 
+
+```
+
+## Comprobo que os contenedores están efectivamente conectados na rede creada no docker compose
+Fago `docker network inspect` nome da rede creada co docker compose:
+
+```
+luk@luk-VirtualBox:~/P6.-DNS--Docker-compose/proyecto_compose$ docker network inspect proyecto_compose_dns_subred
+[
+    {
+        "Name": "proyecto_compose_dns_subred",
+        "Id": "372141aa685e10492177c2ae156daabeb5ce8a89b726069d56dd7a172bf3034b",
+        "Created": "2024-11-05T18:30:48.873146481+01:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.21.0.0/16",
+                    "Gateway": "172.21.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "0494c08b13dcfe53a42daf8c7175a1f56e838bf622facf75cb76caeeae31cc55": {
+                "Name": "alpine-cliente",
+                "EndpointID": "bdfb179cdf77934dba8b701cd2ca1799666c257704cddf450bd7022471a1abde",
+                "MacAddress": "02:42:ac:15:00:03",
+                "IPv4Address": "172.21.0.3/16",
+                "IPv6Address": ""
+            },
+            "488bd7c3655cc6e8054cd422f4c37b8e8cf131a1bf516f842f49995cd1be2e17": {
+                "Name": "bin-dns_Practica_6",
+                "EndpointID": "f88765726e84fe312d6a31411c57f628046528ac035a679a0b1dfce4439c64bd",
+                "MacAddress": "02:42:ac:15:00:02",
+                "IPv4Address": "172.21.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {
+            "com.docker.compose.network": "dns_subred",
+            "com.docker.compose.project": "proyecto_compose",
+            "com.docker.compose.version": "2.29.2"
+        }
+    }
+]
+```
+
+### Se pode comprobar que efectivamente as máquinas foron creadas na mesma rede e que coinciden as ips.
 
 ### Fai a instalación de dig se é preciso.
 
