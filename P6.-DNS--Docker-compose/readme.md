@@ -227,6 +227,8 @@ round-trip min/avg/max = 0.129/0.149/0.177 ms
 ```
 ### Fai a instalación de dig se é preciso.
 
+Non o ten instalado, polo que o instalo:
+
 ### Configura o cliente para que o seu DNS sexa o otro container, modificando el resolv.conf ou usando o fichero docker-compose.yml (preferible)
 
 ### Compróbao con 'dig'.
