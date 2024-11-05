@@ -1,6 +1,8 @@
 # Práctica 6: Configuración cliente + servidor DNS
 
 ### Engade ó docker-compose do DNS outro servicio (container) que faga a función de cliente.
+>[!NOTA]
+>ACTUALIZO EL DOCKER COMPOSE PARA PODER ASIGNAR EL DNS AL CLIENTE. MODIFICO DIRECCIÓN IP E NETWORK. E ENGADO NO MESMO ARQUIVO TODA A CONFIGURACIÓN, ONDE ESPECIFICO A DIRECCIÓN DO DNS
 
 Creo un arquivo docker compose modificando o arquivo un pouco o arquivo anterior:
 
@@ -9,6 +11,7 @@ services:
   bind:
     image: internetsystemsconsortium/bind9:9.18
     container_name: bin-dns_Practica_6
+
     tty: true
     ports:
       - 55:53/udp
@@ -16,23 +19,34 @@ services:
     #- 127.0.0.1:953:953/tcp
     #volumes:
     #  - ./configuracionOpciones:/etc/bind
-    #   - ./conf:/etc/bind
-    #  - ./zonas:/var/lib/bind
+    #   - ./conf:/etc/bind/
+    #  - ./zonas:/var/lib/bind/
+    
     networks:
-      - dns_subred
-
+      lucas:
+        ipv4_address: 172.28.1.1
       
   cliente:
     image: alpine  
     container_name: alpine-cliente
     tty: true
     
+    dns:
+      - 172.28.1.1
     networks:
-      - dns_subred
-      
+      lucas:
+        ipv4_address: 172.28.1.99
+       #caracteristicas de red. rango etc
 networks:
-  dns_subred:
+  lucas:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.1.0/24
+          gateway: 172.28.1.254
+
 ```
 
 A primera imaxe é do servidor e a segunda é do cliente dns, que é o alpine
@@ -102,21 +116,21 @@ lo        Link encap:Local Loopback
        valid_lft forever preferred_lft forever
     inet6 ::1/128 scope host 
        valid_lft forever preferred_lft forever
-26: eth0@if27: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP 
-    link/ether 02:42:ac:15:00:03 brd ff:ff:ff:ff:ff:ff
-    inet 172.21.0.3/16 brd 172.21.255.255 scope global eth0
+29: eth0@if30: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:1c:01:63 brd ff:ff:ff:ff:ff:ff
+    inet 172.28.1.99/16 brd 172.28.255.255 scope global eth0
        valid_lft forever preferred_lft forever
-/ # 
+
 
 
 / # ifconfig
-eth0      Link encap:Ethernet  HWaddr 02:42:AC:15:00:03  
-          inet addr:172.21.0.3  Bcast:172.21.255.255  Mask:255.255.0.0
+eth0      Link encap:Ethernet  HWaddr 02:42:AC:1C:01:63  
+          inet addr:172.28.1.99  Bcast:172.28.255.255  Mask:255.255.0.0
           UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:82 errors:0 dropped:0 overruns:0 frame:0
+          RX packets:72 errors:0 dropped:0 overruns:0 frame:0
           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
           collisions:0 txqueuelen:0 
-          RX bytes:13022 (12.7 KiB)  TX bytes:0 (0.0 B)
+          RX bytes:11434 (11.1 KiB)  TX bytes:0 (0.0 B)
 
 lo        Link encap:Local Loopback  
           inet addr:127.0.0.1  Mask:255.0.0.0
@@ -126,8 +140,6 @@ lo        Link encap:Local Loopback
           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
           collisions:0 txqueuelen:1000 
           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
-
-/ # 
 
 ```
 
@@ -227,9 +239,59 @@ round-trip min/avg/max = 0.129/0.149/0.177 ms
 ```
 ### Fai a instalación de dig se é preciso.
 
-Non o ten instalado, polo que o instalo:
+Fixen  `apk update && apk add bind-tools` no cliente alpine.
+
+No bin (servidor) non tiven que agregar nin instalar nada.
+
+
 
 ### Configura o cliente para que o seu DNS sexa o otro container, modificando el resolv.conf ou usando o fichero docker-compose.yml (preferible)
+
+>[!NOTA]
+>ACTUALIZO EL DOCKER COMPOSE PARA PODER ASIGNAR EL DNS AL CLIENTE. MODIFICO DIRECCIÓN IP E NETWORK.
+
+```
+services:
+  bind:
+    image: internetsystemsconsortium/bind9:9.18
+    container_name: bin-dns_Practica_6
+
+    tty: true
+    ports:
+      - 55:53/udp
+      - 55:53/tcp
+    #- 127.0.0.1:953:953/tcp
+    #volumes:
+    #  - ./configuracionOpciones:/etc/bind
+    #   - ./conf:/etc/bind/
+    #  - ./zonas:/var/lib/bind/
+    
+    networks:
+      dns_subred:
+        ipv4_address: 172.28.1.1
+      
+  cliente:
+    image: alpine  
+    container_name: alpine-cliente
+    tty: true
+    
+    dns:
+      - 172.28.1.1
+    networks:
+      dns_subred:
+        ipv4_address: 172.28.1.99
+       #caracteristicas de red. rango etc
+networks:
+  dns_subred:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.1.0/24
+          gateway: 172.28.5.254
+
+```
 
 ### Compróbao con 'dig'.
 
