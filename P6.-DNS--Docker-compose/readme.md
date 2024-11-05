@@ -37,7 +37,7 @@ networks:
 
 A primera imaxe é do servidor e a segunda é do cliente dns, que é o alpine
 
-Creé la red `dns_subred`. Máis adelante a a continuación...
+Creé la red `dns_subred`. Máis detalle a continuación...
 
 
 ### Usa unha imaxe alpine
@@ -189,6 +189,42 @@ luk@luk-VirtualBox:~/P6.-DNS--Docker-compose/proyecto_compose$ docker network in
 
 ### Se pode comprobar que efectivamente as máquinas foron creadas na mesma rede e que coinciden as ips.
 
+### Agora probo se vense entre elas co comando `ping`.
+
+cliente a servidor:
+```
+/ # ping 172.21.0.2
+PING 172.21.0.2 (172.21.0.2): 56 data bytes
+64 bytes from 172.21.0.2: seq=0 ttl=64 time=0.284 ms
+64 bytes from 172.21.0.2: seq=1 ttl=64 time=0.138 ms
+64 bytes from 172.21.0.2: seq=2 ttl=64 time=0.124 ms
+^C
+--- 172.21.0.2 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.124/0.182/0.284 ms
+/ # ping 172.21.0.4
+PING 172.21.0.4 (172.21.0.4): 56 data bytes
+^C
+--- 172.21.0.4 ping statistics ---
+3 packets transmitted, 0 packets received, 100% packet loss
+```
+
+
+servidor a cliente:
+
+```
+/ # ping 172.21.0.3
+PING 172.21.0.3 (172.21.0.3): 56 data bytes
+64 bytes from 172.21.0.3: seq=0 ttl=64 time=0.129 ms
+64 bytes from 172.21.0.3: seq=1 ttl=64 time=0.177 ms
+64 bytes from 172.21.0.3: seq=2 ttl=64 time=0.136 ms
+64 bytes from 172.21.0.3: seq=3 ttl=64 time=0.154 ms
+^C
+--- 172.21.0.3 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 0.129/0.149/0.177 ms
+/ # ^C
+```
 ### Fai a instalación de dig se é preciso.
 
 ### Configura o cliente para que o seu DNS sexa o otro container, modificando el resolv.conf ou usando o fichero docker-compose.yml (preferible)
