@@ -247,8 +247,8 @@ No bin (servidor) non tiven que agregar nin instalar nada.
 
 ### Configura o cliente para que o seu DNS sexa o otro container, modificando el resolv.conf ou usando o fichero docker-compose.yml (preferible)
 
->[!NOTA]
->ACTUALIZO EL DOCKER COMPOSE PARA PODER ASIGNAR EL DNS AL CLIENTE. MODIFICO DIRECCIÓN IP E NETWORK.
+> [!NOTA]
+> ACTUALIZO EL DOCKER COMPOSE PARA PODER ASIGNAR EL DNS AL CLIENTE. MODIFICO DIRECCIÓN IP E NETWORK.
 
 ```
 services:
