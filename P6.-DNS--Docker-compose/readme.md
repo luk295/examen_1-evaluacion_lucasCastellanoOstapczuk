@@ -433,3 +433,18 @@ www.asircastelao.org.   38400   IN      A       172.28.1.7
 
 ### Resposta: adxunta o repositorio e completa o Readme có realizado (comandos para instalar paquetes y pruebas con 'dig'), explicando a configuración dos arquivos .yml e os seus parámetros
 
+### Comando para instalar paquetes:
+Para instalar os paquetes necesarios para tener dig no cliente foron:
+ `apk update && apk add bind-tools`
+
+Con iso xa teño dig.
+
+### Con dig para comprobar que responde o servior bind:
+  dig @172.28.1.1 ns.asircastelao.org, dig @172.28.1.1 www.asircastelao.org,...
+
+
+### Arquivo yml:
+  Modifiquei a rede, engadín os volumens onde teño gardados os arquivos para montar no servidor.
+  
+
+  
