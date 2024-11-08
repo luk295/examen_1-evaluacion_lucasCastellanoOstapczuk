@@ -247,8 +247,8 @@ No bin (servidor) non tiven que agregar nin instalar nada.
 
 ### Configura o cliente para que o seu DNS sexa o otro container, modificando el resolv.conf ou usando o fichero docker-compose.yml (preferible)
 
->[!NOTA]
->ACTUALIZO EL DOCKER COMPOSE PARA PODER ASIGNAR EL DNS AL CLIENTE. MODIFICO DIRECCIÓN IP E NETWORK.
+> [!NOTA]
+> ACTUALIZO EL DOCKER COMPOSE PARA PODER ASIGNAR EL DNS AL CLIENTE. MODIFICO DIRECCIÓN IP E NETWORK.
 
 ```
 services:
@@ -261,10 +261,10 @@ services:
       - 55:53/udp
       - 55:53/tcp
     #- 127.0.0.1:953:953/tcp
-    #volumes:
+    volumes:
     #  - ./configuracionOpciones:/etc/bind
-    #   - ./conf:/etc/bind/
-    #  - ./zonas:/var/lib/bind/
+       - ./confi:/etc/bind/          # onde estaraá o arquivo named.conf
+       - ./zonas:/var/lib/bind/
     
     networks:
       dns_subred:
@@ -293,7 +293,210 @@ networks:
 
 ```
 
+```
+Engado dous carpetas: "confi" e "zonas".
+
+No confi engado o arquivo de configuración:
+
+
+zone "asircastelao.org" {
+	type master;
+	file "/var/lib/bind/db.asircastelao.org";
+	allow-query {
+		any;
+		};
+	};
+	
+options {
+	directory "/var/cache/bind";
+
+	forwarders {
+	 	8.8.8.8;
+		1.1.1.1;
+	 };
+	 forward only;
+
+	listen-on { any; };
+	listen-on-v6 { any; };
+
+	allow-query {
+		any;
+	};
+};
+
+
+NA CARPETA 'zonas' CREO O ARQUIVO da zona:
+
+$TTL 38400	; 10 hours 40 minutes
+@		IN SOA	ns.asircastelao.org. some.email.address. (
+				10000002   ; serial
+				10800      ; refresh (3 hours)
+				3600       ; retry (1 hour)
+				604800     ; expire (1 week)
+				38400      ; minimum (10 hours 40 minutes)
+				)
+@		IN NS	ns.asircastelao.org.
+ns		IN A		172.28.1.1
+test	IN A		172.28.1.4
+www		IN A		172.28.1.7
+alias	IN CNAME	test
+texto	IN TXT		PROBA DO DNS
+
+
+
+
+```
 ### Compróbao con 'dig'.
+
+Co comando dig vou probando se responde:
+
+`dig @172.28.1.1 ns.asircastelao.org`
+```
+/ # dig @172.28.1.1 ns.asircastelao.org
+
+; <<>> DiG 9.18.27 <<>> @172.28.1.1 ns.asircastelao.org
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 10043
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: fe88dbf22e71271a01000000672e5826ed66a50d46e97cb5 (good)
+;; QUESTION SECTION:
+;ns.asircastelao.org.           IN      A
+
+;; ANSWER SECTION:
+ns.asircastelao.org.    38400   IN      A       172.28.1.1
+
+;; Query time: 0 msec
+;; SERVER: 172.28.1.1#53(172.28.1.1) (UDP)
+;; WHEN: Fri Nov 08 18:27:50 UTC 2024
+;; MSG SIZE  rcvd: 92
+
+```
+`dig @172.28.1.1 test.asircastelao.org`
+```
+/ # dig @172.28.1.1 test.asircastelao.org
+
+; <<>> DiG 9.18.27 <<>> @172.28.1.1 test.asircastelao.org
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 40212
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: ac3613cfa74a807301000000672e58b8ef9b285be2aef4e6 (good)
+;; QUESTION SECTION:
+;test.asircastelao.org.         IN      A
+
+;; ANSWER SECTION:
+test.asircastelao.org.  38400   IN      A       172.28.1.4
+
+;; Query time: 0 msec
+;; SERVER: 172.28.1.1#53(172.28.1.1) (UDP)
+;; WHEN: Fri Nov 08 18:30:16 UTC 2024
+;; MSG SIZE  rcvd: 94
+
+```
+
+`dig @172.28.1.1 www.asircastelao.org`
+```
+
+/ # dig @172.28.1.1 www.asircastelao.org
+
+; <<>> DiG 9.18.27 <<>> @172.28.1.1 www.asircastelao.org
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 17824
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 792dd8dbf731bd8501000000672e590005c228c17a6eb61b (good)
+;; QUESTION SECTION:
+;www.asircastelao.org.          IN      A
+
+;; ANSWER SECTION:
+www.asircastelao.org.   38400   IN      A       172.28.1.7
+
+;; Query time: 0 msec
+;; SERVER: 172.28.1.1#53(172.28.1.1) (UDP)
+;; WHEN: Fri Nov 08 18:31:28 UTC 2024
+;; MSG SIZE  rcvd: 93
+```
+
 
 ### Resposta: adxunta o repositorio e completa o Readme có realizado (comandos para instalar paquetes y pruebas con 'dig'), explicando a configuración dos arquivos .yml e os seus parámetros
 
+### RESUMO DOS APARTADOS:
+
+Creei o arquivo yml configurando algunos parámetros. como a creación dunha nova rede onde estarán o servidor e o cliente.
+
+Fago docker network inspect + nome da rede creada e logo fago ip con cada máquina para verificar que están conectadas, tal como aparecen no docker inspect.
+
+Fago tamén ping entre os contenedores para comprobar que se vexan.
+
+### Comando para instalar paquetes:
+Para instalar os paquetes necesarios para tener dig no cliente foron:
+ `apk update && apk add bind-tools`
+
+Con iso xa teño dig.
+
+### Con dig para comprobar que responde o servior bind:
+  `dig @172.28.1.1 ns.asircastelao.org, dig @172.28.1.1 www.asircastelao.org,...`
+  As respostas ip son as correctas, as que foron asinadas por min no arquivo de configuración das zonas.
+
+
+### Arquivo yml:
+  Modifiquei a rede, engadín os volumens onde teño gardados os arquivos para montar no servidor:
+
+  ```
+services:
+  bind:   ##### nome da imaxe
+    image: internetsystemsconsortium/bind9:9.18 #### a imaxe 
+    container_name: bin-dns_Practica_6 ### nome do contenedor
+
+    tty: true   #### se ten unha terminal asociada...
+    ports: ### os portos que se lle asignan. Na esquerda a máquina local, dereita o contenedor
+      - 55:53/udp
+      - 55:53/tcp
+    #- 127.0.0.1:953:953/tcp
+    volumes:         ###### os volumes que monto dende local á virtual para que se agreguen os arquivos 
+    #  - ./configuracionOpciones:/etc/bind
+       - ./confi:/etc/bind/          # onde estaraá o arquivo named.conf
+       - ./zonas:/var/lib/bind/      # a zona
+    
+    networks:         ###### a rede na que está conectada
+      dns_subred:     ###### nome da rede na que se conecta
+        ipv4_address: 172.28.1.1   ##### o seu IP
+      
+  cliente:         ##### a outra máquina, neste caso o cliente
+    image: alpine  
+    container_name: alpine-cliente
+    tty: true
+    
+    dns:        ####  A dirección do seu servidor DNS
+      - 172.28.1.1
+    networks:
+      dns_subred:
+        ipv4_address: 172.28.1.99
+       ###### Creación da rede. coas súas caracteristicas de red, rango, etc.
+networks:
+  dns_subred:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.1.0/24
+          gateway: 172.28.5.254
+
+```
+
+
+  
