@@ -1,0 +1,40 @@
+services:
+  bind:
+    image: internetsystemsconsortium/bind9:9.18
+    container_name: bin-dns_Practica_6
+
+    tty: true
+    ports:
+      - 55:53/udp
+      - 55:53/tcp
+    #- 127.0.0.1:953:953/tcp
+    volumes:
+    #  - ./configuracionOpciones:/etc/bind
+      - ./confi:/etc/bind/
+      - ./zonas:/var/lib/bind/
+    
+    networks:
+      lucas:
+        ipv4_address: 172.28.1.1
+      
+  cliente:
+    image: alpine  
+    container_name: alpine-cliente
+    tty: true
+    
+    dns:
+      - 172.28.1.1
+    networks:
+      lucas:
+        ipv4_address: 172.28.1.99
+       #caracteristicas de red. rango etc
+networks:
+  lucas:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.1.0/24
+          gateway: 172.28.1.254
+
