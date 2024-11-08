@@ -433,6 +433,14 @@ www.asircastelao.org.   38400   IN      A       172.28.1.7
 
 ### Resposta: adxunta o repositorio e completa o Readme có realizado (comandos para instalar paquetes y pruebas con 'dig'), explicando a configuración dos arquivos .yml e os seus parámetros
 
+### RESUMO DOS APARTADOS:
+
+Creei o arquivo yml configurando algunos parámetros. como a creación dunha nova rede onde estarán o servidor e o cliente.
+
+Fago docker network inspect + nome da rede creada e logo fago ip con cada máquina para verificar que están conectadas, tal como aparecen no docker inspect.
+
+Fago tamén ping entre os contenedores para comprobar que se vexan.
+
 ### Comando para instalar paquetes:
 Para instalar os paquetes necesarios para tener dig no cliente foron:
  `apk update && apk add bind-tools`
@@ -440,11 +448,55 @@ Para instalar os paquetes necesarios para tener dig no cliente foron:
 Con iso xa teño dig.
 
 ### Con dig para comprobar que responde o servior bind:
-  dig @172.28.1.1 ns.asircastelao.org, dig @172.28.1.1 www.asircastelao.org,...
+  `dig @172.28.1.1 ns.asircastelao.org, dig @172.28.1.1 www.asircastelao.org,...`
+  As respostas ip son as correctas, as que foron asinadas por min no arquivo de configuración das zonas.
 
 
 ### Arquivo yml:
-  Modifiquei a rede, engadín os volumens onde teño gardados os arquivos para montar no servidor.
-  
+  Modifiquei a rede, engadín os volumens onde teño gardados os arquivos para montar no servidor:
+
+  ```
+services:
+  bind:   ##### nome da imaxe
+    image: internetsystemsconsortium/bind9:9.18 #### a imaxe 
+    container_name: bin-dns_Practica_6 ### nome do contenedor
+
+    tty: true   #### se ten unha terminal asociada...
+    ports: ### os portos que se lle asignan. Na esquerda a máquina local, dereita o contenedor
+      - 55:53/udp
+      - 55:53/tcp
+    #- 127.0.0.1:953:953/tcp
+    volumes:         ###### os volumes que monto dende local á virtual para que se agreguen os arquivos 
+    #  - ./configuracionOpciones:/etc/bind
+       - ./confi:/etc/bind/          # onde estaraá o arquivo named.conf
+       - ./zonas:/var/lib/bind/      # a zona
+    
+    networks:         ###### a rede na que está conectada
+      dns_subred:     ###### nome da rede na que se conecta
+        ipv4_address: 172.28.1.1   ##### o seu IP
+      
+  cliente:         ##### a outra máquina, neste caso o cliente
+    image: alpine  
+    container_name: alpine-cliente
+    tty: true
+    
+    dns:        ####  A dirección do seu servidor DNS
+      - 172.28.1.1
+    networks:
+      dns_subred:
+        ipv4_address: 172.28.1.99
+       ###### Creación da rede. coas súas caracteristicas de red, rango, etc.
+networks:
+  dns_subred:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.1.0/24
+          gateway: 172.28.5.254
+
+```
+
 
   
